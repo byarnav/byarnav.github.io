@@ -545,9 +545,8 @@ ol { list-style: none; }
   align-items: stretch;
 }
 .imprint > * { padding: 24px var(--gutter); }
-.imprint .left { grid-column: 1 / span 3; border-right: var(--hair); }
-.imprint .mid  { grid-column: 4 / span 6; }
-.imprint .right { grid-column: 10 / -1; text-align: right; }
+.imprint .left { grid-column: 1 / span 8; border-right: var(--hair); }
+.imprint .right { grid-column: 9 / -1; text-align: right; }
 
 /* ── Responsiveness: the grid folds, it never dissolves ─────── */
 
@@ -623,7 +622,7 @@ ol { list-style: none; }
   .plates > div { border-right: 0; padding-bottom: 40px; }
   .plates > div + div { border-top: var(--hair); }
 
-  .imprint .left, .imprint .mid, .imprint .right {
+  .imprint .left, .imprint .right {
     grid-column: 1 / -1; border-right: 0; text-align: left;
   }
   .imprint > * + * { border-top: var(--hair); }
@@ -757,7 +756,7 @@ ol { list-style: none; }
             <p>You make a vow. The machine holds you to it.</p>
           </div>
 
-          <a class="invitation" href="https://vow.byarnav.com">
+          <a class="invitation" href="https://vow.byarnav.com" target="_blank" rel="noopener noreferrer">
             <span>Explore the Instrument</span>
             <span class="arrow" aria-hidden="true">&rarr;</span>
           </a>
@@ -948,7 +947,6 @@ ol { list-style: none; }
 
     <div class="imprint grid mono muted" style="grid-column: 1 / -1;">
       <span class="left">&copy; 2026 byArnav. All rights reserved.</span>
-      <span class="mid">byarnav.com</span>
       <span class="right">Edition 2026.11</span>
     </div>
   </footer>
