@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>byArnav · Software Atelier</title>
+<meta name="description" content="byArnav is an independent software atelier crafting precision instruments in native Swift for Apple hardware. Native, invariant, private, owned.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0B0B0C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F6F5F0" media="(prefers-color-scheme: light)">
+<link rel="canonical" href="https://byarnav.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230B0B0C'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23F2F0EC' stroke-width='1.5'/%3E%3Cpath d='M16 4v5' stroke='%23F2F0EC' stroke-width='1.5'/%3E%3C/svg%3E">
+<meta property="og:title" content="byArnav · Software Atelier">
+<meta property="og:description" content="In an age of the disposable, permanence is the ultimate luxury.">
+<meta property="og:url" content="https://byarnav.com/">
+<meta property="og:type" content="website">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   byArnav // Software Atelier
+   Material tokens. Dark is the default state; light is paper.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --ground:   #0B0B0C;   /* matte obsidian */
+  --surface:  #111113;   /* deep charcoal */
+  --rule:     #222225;   /* hairline */
+  --ink:      #F2F0EC;   /* bone */
+  --muted:    #7C7C82;   /* titanium */
+  --invert:   #0B0B0C;
+
+  --serif: "New York", ui-serif, Georgia, serif;
+  --sans:  -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --mono:  "SF Mono", ui-monospace, Menlo, monospace;
+
+  --gutter: clamp(24px, 4vw, 64px);
+  --band:   clamp(88px, 13vw, 196px);
+  --hair:   1px solid var(--rule);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --ground:  #F6F5F0;  /* unbleached museum paper */
+    --surface: #EFEEE7;
+    --rule:    #E2E0D8;
+    --ink:     #111111;  /* deep carbon */
+    --muted:   #6E6D68;  /* stone */
+    --invert:  #F6F5F0;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+}
+
+::selection { background: var(--ink); color: var(--invert); }
+
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+h1, h2, h3, p, dl, dd, ol, figure { margin: 0; padding: 0; }
+ol { list-style: none; }
+
+/* ── Typographic voices ─────────────────────────────────────── */
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+.muted { color: var(--muted); }
+
+.serif {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.prose p {
+  max-width: 56ch;
+  color: var(--ink);
+}
+.prose p + p { margin-top: 1.5em; }
+.prose .lede {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2vw, 27px);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  max-width: 34ch;
+  margin-bottom: 2.25em;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 12px 16px;
+  background: var(--ink);
+  color: var(--invert);
+  z-index: 10;
+}
+.skip:focus { left: 16px; top: 16px; }
+
+/* ── The frame: an exposed architectural grid ───────────────── */
+
+.frame {
+  max-width: 1440px;
+  margin: 0 auto;
+  border-left: var(--hair);
+  border-right: var(--hair);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.section { border-bottom: var(--hair); }
+
+.index {
+  grid-column: 1 / span 3;
+  border-right: var(--hair);
+  padding: var(--band) var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.index .marker { position: sticky; top: 36px; }
+.index .marker .no { color: var(--ink); }
+.index .meta {
+  margin-top: auto;
+  display: grid;
+  gap: 10px;
+}
+.index .meta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: var(--hair);
+  padding-top: 10px;
+}
+
+.body {
+  grid-column: 4 / -1;
+  min-width: 0;
+}
+
+/* ── I. Header ──────────────────────────────────────────────── */
+
+.masthead {
+  border-bottom: var(--hair);
+  align-items: stretch;
+}
+.masthead > * {
+  padding: 24px var(--gutter);
+  display: flex;
+  align-items: center;
+}
+.wordmark {
+  grid-column: 1 / span 3;
+  border-right: var(--hair);
+  font-family: var(--serif);
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.wordmark em { font-style: italic; color: var(--muted); padding-right: 0.04em; }
+.classification {
+  grid-column: 4 / span 3;
+  color: var(--muted);
+}
+.nav {
+  grid-column: 7 / -1;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px var(--gutter) 24px 24px;
+  border-left: var(--hair);
+  color: var(--muted);
+  transition: color 240ms linear, background-color 240ms linear;
+}
+.nav a span { color: var(--ink); transition: color 240ms linear; }
+.nav a:hover { color: var(--ink); background: var(--surface); }
+
+/* ── II. The Monologue ──────────────────────────────────────── */
+
+.monologue .body {
+  padding: var(--band) var(--gutter) var(--band);
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+/* The statement is set as a printed plate: warm paper, black
+   ink, a display serif, and a deliberately ragged left edge. */
+.statement {
+  grid-column: 1 / -1;
+  margin: calc(var(--band) * -1) calc(var(--gutter) * -1) clamp(56px, 7vw, 104px);
+  padding: clamp(56px, 8vw, 116px) var(--gutter) clamp(48px, 7vw, 100px);
+  background: #F4F1E8;  /* laid paper */
+  color: #111110;       /* carbon ink */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  font-family: "Canela", "Canela Deck", "Didot", "Bodoni 72", "Playfair Display", ui-serif, Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(40px, 8.6vw, 124px);
+  line-height: 1.03;
+  letter-spacing: -0.025em;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+}
+.statement .line {
+  display: block;
+  white-space: nowrap;
+}
+.statement .line + .line {
+  margin-top: 0.02em;
+}
+.statement .indent {
+  padding-left: 0.9em;
+}
+.statement .deep {
+  padding-left: 1.5em;
+}
+.statement em {
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+.essay-label {
+  grid-column: 1 / span 3;
+  border-top: var(--hair);
+  padding-top: 24px;
+  align-self: start;
+}
+.essay-label h2 {
+  font-family: var(--serif);
+  font-size: 23px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  margin-top: 18px;
+  max-width: 14ch;
+}
+.essay {
+  grid-column: 4 / -1;
+  border-top: var(--hair);
+  padding-top: 24px;
+}
+.essay .mono { margin-bottom: 48px; display: block; }
+
+.principles {
+  grid-column: 1 / -1;
+  margin-top: var(--band);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: var(--hair);
+}
+.principles li {
+  padding: 36px 32px 16px 0;
+  border-right: var(--hair);
+  margin-right: 32px;
+}
+.principles li:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+.principles h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 25px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 28px 0 14px;
+}
+.principles p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 24ch;
+}
+
+/* ── III. The Showroom Floor ────────────────────────────────── */
+
+.showroom .body {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+
+.placard {
+  grid-column: 1 / span 4;
+  padding: var(--band) var(--gutter);
+  display: flex;
+  flex-direction: column;
+}
+.placard .status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.placard .status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+  flex: none;
+}
+.placard h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(80px, 10vw, 156px);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin: 64px 0 32px -0.03em;
+}
+.placard .subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(21px, 1.9vw, 26px);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  max-width: 22ch;
+  margin-bottom: 56px;
+}
+.placard .prose { border-top: var(--hair); padding-top: 36px; }
+.placard .prose p { font-size: 16px; }
+
+.invitation {
+  margin-top: 64px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  min-width: min(100%, 320px);
+  padding: 22px 24px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  transition: background-color 320ms linear, color 320ms linear;
+}
+.invitation .arrow {
+  font-family: var(--mono);
+  transition: transform 320ms linear;
+}
+.invitation:hover, .invitation:focus-visible {
+  background: var(--ink);
+  color: var(--invert);
+}
+.invitation:hover .arrow { transform: translateX(4px); }
+.invitation-note { margin-top: 16px; }
+
+.pedestal {
+  grid-column: 5 / -1;
+  border-left: var(--hair);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+.plate {
+  padding: 20px var(--gutter);
+  border-bottom: var(--hair);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.dial {
+  padding: clamp(44px, 7vw, 104px) var(--gutter);
+  border-bottom: var(--hair);
+}
+.dial svg {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+.dial figcaption {
+  margin-top: 48px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* SVG strokes and inks, themed through tokens */
+.s-rule  { stroke: var(--rule); }
+.s-muted { stroke: var(--muted); }
+.s-ink   { stroke: var(--ink); }
+.f-ink   { fill: var(--ink); }
+.f-muted { fill: var(--muted); }
+.t-mono {
+  font-family: var(--mono);
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+}
+.sweep {
+  transform-box: view-box;
+  transform-origin: 240px 240px;
+  animation: sweep 60s linear infinite;
+}
+@keyframes sweep { to { transform: rotate(360deg); } }
+
+.ledger {
+  display: grid;
+}
+.ledger > div {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  border-bottom: var(--hair);
+}
+.ledger > div:last-child { border-bottom: 0; }
+.ledger dt, .ledger dd {
+  padding: 20px var(--gutter);
+}
+.ledger dt { color: var(--muted); border-right: var(--hair); padding-top: 22px; }
+.ledger dd { font-size: 15px; line-height: 1.55; }
+
+/* ── IV. The Horizon ────────────────────────────────────────── */
+
+.horizon .body { padding: var(--band) 0 0; }
+.horizon .intro {
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  margin-bottom: 96px;
+}
+.horizon .intro h2 {
+  grid-column: 1 / span 5;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(36px, 4.6vw, 68px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+.horizon .intro p {
+  grid-column: 6 / -1;
+  align-self: end;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.archive { border-top: var(--hair); }
+.archive .head, .archive li {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 5fr);
+}
+.archive .head > span, .archive li > * {
+  padding: 20px var(--gutter);
+  border-right: var(--hair);
+}
+.archive .head > span:last-child, .archive li > *:last-child { border-right: 0; }
+.archive .head { border-bottom: var(--hair); color: var(--muted); }
+.archive li { border-bottom: var(--hair); }
+.archive li:last-child { border-bottom: 0; }
+.archive li > * { padding-top: 40px; padding-bottom: 48px; }
+.archive h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(24px, 2.3vw, 32px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  max-width: 26ch;
+}
+.archive .entry p { color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 52ch; }
+.archive .sealed h3, .archive .sealed .no { color: var(--muted); }
+
+/* ── V. Colophon ────────────────────────────────────────────── */
+
+.colophon .body { padding: var(--band) 0 0; }
+.colophon .signature {
+  padding: 0 var(--gutter) 96px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(36px, 4.6vw, 68px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+.colophon .signature em { font-style: italic; color: var(--muted); }
+
+.plates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: var(--hair);
+}
+.plates > div {
+  padding: 36px var(--gutter) 64px;
+  border-right: var(--hair);
+}
+.plates > div:last-child { border-right: 0; }
+.plates p {
+  margin-top: 24px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 28ch;
+}
+.plates p strong { color: var(--ink); font-weight: 400; }
+.plates a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--muted);
+  transition: border-color 240ms linear;
+}
+.plates a:hover { border-color: var(--ink); }
+
+.doctrine {
+  border-top: var(--hair);
+  padding: 24px var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 44px;
+}
+
+.imprint {
+  border-top: var(--hair);
+  align-items: stretch;
+}
+.imprint > * { padding: 24px var(--gutter); }
+.imprint .left { grid-column: 1 / span 3; border-right: var(--hair); }
+.imprint .mid  { grid-column: 4 / span 6; }
+.imprint .right { grid-column: 10 / -1; text-align: right; }
+
+/* ── Responsiveness: the grid folds, it never dissolves ─────── */
+
+@media (max-width: 1100px) {
+  .showroom .placard { grid-column: 1 / -1; padding-bottom: 80px; }
+  .showroom .pedestal { grid-column: 1 / -1; border-left: 0; border-top: var(--hair); }
+  .principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .principles li:nth-child(2) { border-right: 0; margin-right: 0; padding-right: 0; }
+  .principles li:nth-child(n+3) { border-top: var(--hair); margin-top: 24px; }
+  .plates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .plates > div:nth-child(2) { border-right: 0; }
+  .plates > div:nth-child(n+3) { border-top: var(--hair); }
+  .classification { display: none; }
+  .nav { grid-column: 4 / -1; }
+}
+
+@media (max-width: 820px) {
+  body { font-size: 16px; }
+  .masthead .wordmark { grid-column: 1 / -1; border-right: 0; border-bottom: var(--hair); }
+  .nav { grid-column: 1 / -1; grid-template-columns: repeat(2, 1fr); }
+  .nav a { padding: 18px; border-left: 0; }
+  .nav a:nth-child(odd) { border-right: var(--hair); }
+  .nav a:nth-child(-n+2) { border-bottom: var(--hair); }
+
+  .index {
+    grid-column: 1 / -1;
+    border-right: 0;
+    border-bottom: var(--hair);
+    padding: 22px 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .index .marker { position: static; }
+  .index .meta { display: none; }
+  .body { grid-column: 1 / -1; }
+
+  :root { --gutter: 20px; --band: 72px; }
+
+  .monologue .body, .horizon .intro { display: block; }
+  .statement { margin-bottom: 64px; }
+  .statement .indent { padding-left: 0.5em; }
+  .statement .deep { padding-left: 0.9em; }
+  .essay-label { margin-bottom: 36px; }
+  .essay { border-top: 0; padding-top: 0; }
+  .principles { margin-top: 72px; grid-template-columns: 1fr; }
+  .principles li, .principles li:nth-child(2) {
+    border-right: 0; margin-right: 0; padding-right: 0;
+  }
+  .principles li + li { border-top: var(--hair); margin-top: 24px; }
+  .principles h3 { margin-top: 20px; }
+
+  .placard h2 { margin-top: 44px; }
+  .invitation { width: 100%; }
+  .ledger > div { grid-template-columns: 1fr; }
+  .ledger dt { border-right: 0; padding-bottom: 0; }
+  .ledger dd { padding-top: 8px; }
+
+  .horizon .intro h2 { margin-bottom: 24px; }
+  .horizon .intro { margin-bottom: 64px; }
+  .archive .head { display: none; }
+  .archive li { grid-template-columns: 1fr 1fr; }
+  .archive li > * { border-right: 0; padding-top: 24px; padding-bottom: 0; }
+  .archive li > .no { border-right: var(--hair); padding-bottom: 20px; }
+  .archive li > .entry {
+    grid-column: 1 / -1;
+    border-top: var(--hair);
+    padding-bottom: 40px;
+  }
+
+  .plates { grid-template-columns: 1fr; }
+  .plates > div { border-right: 0; padding-bottom: 40px; }
+  .plates > div + div { border-top: var(--hair); }
+
+  .imprint .left, .imprint .mid, .imprint .right {
+    grid-column: 1 / -1; border-right: 0; text-align: left;
+  }
+  .imprint > * + * { border-top: var(--hair); }
+}
+
+@media (max-width: 480px) {
+  .statement { font-size: clamp(32px, 10.4vw, 44px); line-height: 1.03; }
+}
+
+@media (prefers-color-scheme: light) {
+  .statement { background: #F2EEE2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sweep { animation: none; }
+  * { transition: none !important; }
+}
+
+@media print {
+  .nav, .skip { display: none; }
+  .sweep { animation: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#manifesto">Skip to the manifesto</a>
+
+<div class="frame">
+
+  <!-- ═══ I. Masthead ═══════════════════════════════════════ -->
+  <header class="masthead grid">
+    <a class="wordmark" href="/" aria-label="byArnav, home"><em>by</em>Arnav</a>
+    <div class="classification mono">Software Atelier</div>
+    <nav class="nav mono" aria-label="Index">
+      <a href="#manifesto"><span>01</span> Manifesto</a>
+      <a href="#instruments"><span>02</span> Instruments</a>
+      <a href="#horizon"><span>03</span> Horizon</a>
+      <a href="#colophon"><span>04</span> Inquiries</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ═══ II. Section 01 · The Monologue ════════════════════ -->
+    <section class="section monologue grid" id="manifesto" aria-labelledby="statement">
+      <aside class="index">
+        <div class="marker mono muted"><span class="no">01</span> / Manifesto</div>
+        <div class="meta mono muted">
+          <div><span>Filed</span><span>Atelier Notes</span></div>
+          <div><span>Volume</span><span>I</span></div>
+          <div><span>Standard</span><span>Native Swift</span></div>
+        </div>
+      </aside>
+
+      <div class="body">
+        <h1 class="statement" id="statement">
+          <span class="line">In an age of</span>
+          <span class="line indent">the disposable,</span>
+          <span class="line">permanence is the</span>
+          <span class="line deep"><em>ultimate luxury.</em></span>
+        </h1>
+
+        <div class="essay-label">
+          <span class="mono muted">Essay &middot; I</span>
+          <h2>On Material Integrity in Software</h2>
+        </div>
+
+        <article class="essay prose">
+          <span class="mono muted">byArnav &middot; Written at the bench, 2026</span>
+
+          <p class="lede">Most software today is not built. It is assembled. And what is assembled cheaply is made to be thrown away.</p>
+
+          <p>A webpage wrapped in a window. A window wrapped in a subscription. A subscription wrapped in a funnel. It arrives weighing hundreds of megabytes to perform the simplest task. It interrupts your work with popups, countdowns, and artificial urgency. It measures how long you linger, and learns, with great patience, how to make you linger longer.</p>
+
+          <p>We regard this as a failure of material. A chair of particleboard will hold weight for a season; a chair joined from solid oak is still a chair a century on. Software has materials too. The cheapest of them are bloat, surveillance, and noise. They are everywhere today simply because they are cheap.</p>
+
+          <p>Every instrument from this atelier is written natively in Swift for Apple hardware, with the grain of the system rather than against it. Whether on the desk, in the hand, or on the wrist, it opens before you have finished deciding to open it. Its behaviour is governed by invariants: conditions reasoned through before a single line ships, so that the instrument does precisely what it claims, and nothing it does not.</p>
+
+          <p>Our tools are built to serve their owner, never to monetize them. There is no advertising machinery, no attention harvesting, and no quiet scheme to trade on your habits. What you do with an instrument is yours in the oldest sense of the word: private, unobserved, and complete.</p>
+
+          <p>We make few things, and we make them slowly. We would rather make one tool you keep for a decade than ten you forget by spring.</p>
+        </article>
+
+        <ol class="principles" aria-label="Principles">
+          <li>
+            <span class="mono muted">i.</span>
+            <h3>Native</h3>
+            <p>Written for the machine it runs on. Never a webpage in disguise.</p>
+          </li>
+          <li>
+            <span class="mono muted">ii.</span>
+            <h3>Invariant</h3>
+            <p>Correct in every state, not merely in most of them.</p>
+          </li>
+          <li>
+            <span class="mono muted">iii.</span>
+            <h3>Private</h3>
+            <p>Nothing observed. Nothing collected. Nothing transmitted.</p>
+          </li>
+          <li>
+            <span class="mono muted">iv.</span>
+            <h3>Owned</h3>
+            <p>Purchased once, and kept. A tool, not a tenancy.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ═══ III. Section 02 · The Showroom Floor ══════════════ -->
+    <section class="section showroom grid" id="instruments" aria-labelledby="vow">
+      <aside class="index">
+        <div class="marker mono muted"><span class="no">02</span> / Instruments</div>
+        <div class="meta mono muted">
+          <div><span>On Display</span><span>No. 01</span></div>
+          <div><span>Platform</span><span>macOS</span></div>
+          <div><span>Edition</span><span>2026</span></div>
+        </div>
+      </aside>
+
+      <div class="body">
+        <div class="placard">
+          <p class="status mono">Instrument No. 01 &middot; Available</p>
+
+          <h2 class="serif" id="vow">Vow</h2>
+          <p class="subtitle">The uncompromised offline lock for macOS.</p>
+
+          <div class="prose">
+            <p>Vow is not a screen-time toy. There are no streaks to protect, no badges to collect, and no cheerful reminders that you have done well today. It is an instrument of will.</p>
+            <p>Set the duration. Engage the lock. Vow severs network connections at the level of the system itself, not in a browser extension, and not through a blocklist one clever search can outrun. There is no instant escape, because an instant escape is the whole problem.</p>
+            <p>You make a vow. The machine holds you to it.</p>
+          </div>
+
+          <a class="invitation" href="https://vow.byarnav.com">
+            <span>Explore the Instrument</span>
+            <span class="arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          <p class="invitation-note mono muted">vow.byarnav.com</p>
+        </div>
+
+        <div class="pedestal">
+          <div class="plate mono muted">
+            <span>Fig. 01 &middot; Dial</span>
+            <span>Lock Engaged</span>
+          </div>
+
+          <figure class="dial">
+            <svg viewBox="0 0 480 480" role="img" aria-labelledby="dial-title dial-desc">
+              <title id="dial-title">Vow dial schematic</title>
+              <desc id="dial-desc">A hairline instrument dial with sixty calibration ticks. A four-hour arc is engaged from twelve to four o’clock. The readout states: severed, four hours.</desc>
+
+              <!-- bezel -->
+              <circle cx="240" cy="240" r="236" fill="none" class="s-rule" stroke-width="1"/>
+              <circle cx="240" cy="240" r="226" fill="none" class="s-rule" stroke-width="1"/>
+
+              <!-- calibration: 60 minor, 12 major -->
+              <g transform="rotate(-90 240 240)">
+                <circle cx="240" cy="240" r="214" fill="none" class="s-muted" stroke-width="8"
+                        pathLength="360" stroke-dasharray="0.35 5.65" stroke-dashoffset="0.175"/>
+                <circle cx="240" cy="240" r="212" fill="none" class="s-ink" stroke-width="12"
+                        pathLength="360" stroke-dasharray="0.7 29.3" stroke-dashoffset="0.35"/>
+              </g>
+
+              <!-- numerals -->
+              <g class="t-mono f-muted" font-size="11" text-anchor="middle" dominant-baseline="central">
+                <text x="240" y="186" class="f-ink">00</text>
+                <text x="294" y="240">03</text>
+                <text x="240" y="294">06</text>
+                <text x="186" y="240">09</text>
+              </g>
+              <g class="t-mono f-muted" font-size="10" text-anchor="middle" dominant-baseline="central">
+                <text x="240" y="40">XII</text>
+                <text x="440" y="240">III</text>
+                <text x="240" y="440">VI</text>
+                <text x="40" y="240">IX</text>
+              </g>
+
+              <!-- engagement track and the four-hour arc -->
+              <circle cx="240" cy="240" r="168" fill="none" class="s-rule" stroke-width="1"/>
+              <g transform="rotate(-90 240 240)">
+                <circle cx="240" cy="240" r="168" fill="none" class="s-ink" stroke-width="2"
+                        pathLength="360" stroke-dasharray="120 240"/>
+              </g>
+              <line x1="240" y1="80" x2="240" y2="56" class="s-ink" stroke-width="1"/>
+              <line x1="378.6" y1="320" x2="399.4" y2="332" class="s-ink" stroke-width="1"/>
+
+              <!-- inner rings -->
+              <circle cx="240" cy="240" r="128" fill="none" class="s-rule" stroke-width="1"/>
+              <circle cx="240" cy="240" r="80" fill="none" class="s-rule" stroke-width="1" stroke-dasharray="1 5"/>
+
+              <!-- reticle -->
+              <line x1="240" y1="120" x2="240" y2="136" class="s-muted" stroke-width="1"/>
+              <line x1="240" y1="344" x2="240" y2="360" class="s-muted" stroke-width="1"/>
+              <line x1="120" y1="240" x2="136" y2="240" class="s-muted" stroke-width="1"/>
+              <line x1="344" y1="240" x2="360" y2="240" class="s-muted" stroke-width="1"/>
+              <line x1="232" y1="240" x2="248" y2="240" class="s-ink" stroke-width="1"/>
+              <line x1="240" y1="232" x2="240" y2="248" class="s-ink" stroke-width="1"/>
+
+              <!-- the sweep: one revolution per minute -->
+              <g class="sweep">
+                <line x1="240" y1="80" x2="240" y2="102" class="s-ink" stroke-width="1"/>
+                <circle cx="240" cy="102" r="1.75" class="f-ink"/>
+              </g>
+
+              <!-- readout -->
+              <text x="240" y="216" text-anchor="middle" class="t-mono f-muted" font-size="9">VOW &#183; NO. 01</text>
+              <text x="240" y="306" text-anchor="middle" class="t-mono f-muted" font-size="9">STATE: SEVERED //</text>
+              <text x="240" y="330" text-anchor="middle" class="t-mono f-ink" font-size="15">04:00:00</text>
+            </svg>
+
+            <figcaption class="mono muted">
+              <span>Network: Severed</span>
+              <span>Duration: 04:00:00</span>
+              <span>Scale 1 : 1</span>
+            </figcaption>
+          </figure>
+
+          <div class="plate mono muted">
+            <span>Specification</span>
+            <span>Ledger &middot; macOS</span>
+          </div>
+
+          <dl class="ledger">
+            <div><dt class="mono">Architecture</dt><dd>Pure Native Swift &amp; AppKit</dd></div>
+            <div><dt class="mono">Memory Footprint</dt><dd>&lt; 20 MB RAM</dd></div>
+            <div><dt class="mono">Idle Overhead</dt><dd>0.1% CPU</dd></div>
+            <div><dt class="mono">Failure Doctrine</dt><dd>Fails Open on Corruption / Closed on Lock</dd></div>
+            <div><dt class="mono">Telemetry &amp; Analytics</dt><dd>Absolute Zero</dd></div>
+            <div><dt class="mono">Ownership</dt><dd>Perpetual. No Subscriptions.</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ IV. Section 03 · The Horizon ══════════════════════ -->
+    <section class="section horizon grid" id="horizon" aria-labelledby="horizon-title">
+      <aside class="index">
+        <div class="marker mono muted"><span class="no">03</span> / Horizon</div>
+        <div class="meta mono muted">
+          <div><span>In Craft</span><span>03</span></div>
+          <div><span>Release</span><span>When Ready</span></div>
+        </div>
+      </aside>
+
+      <div class="body">
+        <div class="intro">
+          <h2 id="horizon-title">Works on the bench.</h2>
+          <p>The atelier keeps no public roadmap and announces no dates. What follows is a ledger of instruments currently in research. Each will be released when it is finished, and not a day before.</p>
+        </div>
+
+        <div class="archive">
+          <div class="head mono" aria-hidden="true">
+            <span>Instrument</span><span>Form Factor</span><span>Subject</span>
+          </div>
+          <ol>
+            <li>
+              <span class="no mono">No. 02</span>
+              <span class="mono muted">macOS &middot; iOS</span>
+              <div class="entry">
+                <h3>An architecture for long-form thought.</h3>
+                <p>A place to hold one sustained piece of thinking, and nothing else. Engineered to move effortlessly between the desk and the hand, with zero interface clutter. Being drawn to scale.</p>
+              </div>
+            </li>
+            <li>
+              <span class="no mono">No. 03</span>
+              <span class="mono muted">iOS &middot; watchOS</span>
+              <div class="entry">
+                <h3>Tactile rhythm &amp; physical stillness.</h3>
+                <p>An instrument for the wrist and the pocket. Crafted around precision haptics, glanceable horological geometry, and deliberate daily cadence.</p>
+              </div>
+            </li>
+            <li class="sealed">
+              <span class="no mono">No. 04</span>
+              <span class="mono muted">Sealed</span>
+              <div class="entry">
+                <h3>Not yet spoken of.</h3>
+                <p>Some work is better left unannounced until it can speak for itself.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ V. Colophon ═══════════════════════════════════════ -->
+  <footer class="section colophon grid" id="colophon" aria-label="Colophon">
+    <aside class="index">
+      <div class="marker mono muted"><span class="no">04</span> / Colophon</div>
+    </aside>
+
+    <div class="body">
+      <p class="signature">Designed with restraint.<br><em>Built to endure.</em></p>
+
+      <div class="plates">
+        <div>
+          <span class="mono muted">Inquiries</span>
+          <p>Correspondence is read and answered by hand.<br><a href="mailto:support@byarnav.com">support@byarnav.com</a></p>
+        </div>
+        <div>
+          <span class="mono muted">Typography</span>
+          <p>Set in <strong>New York</strong> and <strong>San Francisco</strong>, with figures in <strong>SF Mono</strong>. The native typefaces of the hardware these instruments are written for.</p>
+        </div>
+        <div>
+          <span class="mono muted">Construction</span>
+          <p>A single document of hand-written HTML and CSS. No frameworks, no fonts to fetch, nothing to wait for.</p>
+        </div>
+        <div>
+          <span class="mono muted">Provenance</span>
+          <p>Conceived, engineered, and maintained by an independent software atelier. Crafted in native Swift for Apple hardware.</p>
+        </div>
+      </div>
+
+      <p class="doctrine mono">
+        <span>Zero Cookies.</span>
+        <span>Zero Scripts.</span>
+        <span>Zero Tracking.</span>
+        <span>Instantaneous.</span>
+      </p>
+    </div>
+
+    <div class="imprint grid mono muted" style="grid-column: 1 / -1;">
+      <span class="left">&copy; 2026 byArnav. All rights reserved.</span>
+      <span class="mid">byarnav.com</span>
+      <span class="right">Edition 2026.11</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
